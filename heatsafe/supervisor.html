@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HeatSafe — Supervisor Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="hs-prototype-corner"><span class="hs-tag">Prototype Mode</span></div>
+
+<header class="hs-topbar">
+  <div class="hs-topbar-inner">
+    <div class="hs-brand">
+      <div class="hs-brand-mark">🌡️</div>
+      <div class="hs-brand-text">
+        <div class="hs-brand-name">HEATSAFE</div>
+        <div class="hs-brand-sub">Supervisor Command Center</div>
+      </div>
+    </div>
+    <div class="hs-topbar-right">
+      <span class="hs-topbar-badge">Udupi Coastal Zone · S-001</span>
+      <a href="index.html" class="hs-switch-portal">Switch Portal</a>
+    </div>
+  </div>
+</header>
+
+<nav class="hs-subnav">
+  <div class="hs-subnav-inner">
+    <a href="#" class="nav-tab active" data-tab="dashboard">Dashboard</a>
+    <a href="#" class="nav-tab" data-tab="workers">Workers</a>
+    <a href="#" class="nav-tab" data-tab="riskmonitor">Risk Monitor</a>
+    <a href="#" class="nav-tab" data-tab="worksites">Worksites</a>
+    <a href="#" class="nav-tab" data-tab="recommendations">Recommendations</a>
+  </div>
+</nav>
+
+<main class="hs-main">
+
+  <!-- ================= DASHBOARD ================= -->
+  <section id="tab-dashboard" class="hs-tab-panel">
+    <div class="hs-page-head">
+      <div class="hs-head-row">
+        <div>
+          <h1>Worksite Safety Overview</h1>
+          <p class="hs-sub">Real-time prototype crew assessment</p>
+        </div>
+        <span class="hs-tag">Simulated Crew Data</span>
+      </div>
+    </div>
+
+    <div class="hs-kpi-grid" id="dash-kpis"></div>
+
+    <div class="hs-grid-2">
+      <div class="hs-card hs-card-pad">
+        <div class="hs-section-title">Highest Priority Workers</div>
+        <p class="hs-section-sub">Workers currently flagged as high risk in your crew.</p>
+        <div class="hs-table-wrap hs-table-scroll">
+          <table class="hs-table" id="dash-priority-table">
+            <thead><tr><th>Worker</th><th>Occupation</th><th>Exposure</th><th>Hydration</th><th>Risk</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="hs-card hs-card-pad">
+        <div class="hs-section-title">Recommended Actions</div>
+        <p class="hs-section-sub">Generated from your crew's current data.</p>
+        <div id="dash-recommendations"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WORKERS ================= -->
+  <section id="tab-workers" class="hs-tab-panel hs-hidden">
+    <div class="hs-page-head">
+      <h1>Crew Directory</h1>
+      <p class="hs-sub">All 24 workers assigned to Udupi Coastal Zone.</p>
+    </div>
+    <div class="hs-filter-bar">
+      <input type="text" id="workers-search" placeholder="Search Worker ID or occupation..." oninput="hsRenderWorkersTab()">
+    </div>
+    <div class="hs-table-wrap hs-table-scroll">
+      <table class="hs-table" id="workers-table">
+        <thead><tr><th>Worker ID</th><th>Occupation</th><th>Location</th><th>Intensity</th><th>Exposure</th><th>Hydration</th><th>Heat Risk</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= RISK MONITOR ================= -->
+  <section id="tab-riskmonitor" class="hs-tab-panel hs-hidden">
+    <div class="hs-page-head">
+      <h1>Risk Monitor</h1>
+      <p class="hs-sub">Crew sorted by heat-stress risk, highest first. Click a worker for full detail.</p>
+    </div>
+    <div class="hs-table-wrap hs-table-scroll">
+      <table class="hs-table" id="riskmonitor-table">
+        <thead><tr><th>Worker ID</th><th>Occupation</th><th>Location</th><th>Work Intensity</th><th>Exposure</th><th>Hydration</th><th>Heat Risk</th><th>Recommended Action</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= WORKSITES ================= -->
+  <section id="tab-worksites" class="hs-tab-panel hs-hidden">
+    <div class="hs-page-head">
+      <h1>Worksite Risk Map</h1>
+      <p class="hs-sub">Stylized location map — click a marker for site detail. <span class="hs-tag hs-tag-muted">Representative Data</span></p>
+    </div>
+    <div class="hs-map-card" id="map-card"></div>
+  </section>
+
+  <!-- ================= RECOMMENDATIONS ================= -->
+  <section id="tab-recommendations" class="hs-tab-panel hs-hidden">
+    <div class="hs-page-head">
+      <h1>Recommended Actions</h1>
+      <p class="hs-sub">Generated automatically from current crew data.</p>
+    </div>
+    <div class="hs-card hs-card-pad" id="reco-full-panel"></div>
+  </section>
+
+</main>
+
+<footer class="hs-footer">
+  <div class="hs-footer-inner">
+    <span class="hs-footer-icon">ℹ️</span>
+    <p>This prototype demonstrates the proposed HeatSafe workflow using representative data and deterministic rules. It is not a live occupational health monitoring or medical diagnostic system.</p>
+  </div>
+</footer>
+
+<!-- ================= WORKER DETAIL DRAWER ================= -->
+<div class="hs-overlay" id="worker-drawer-overlay" onclick="hsCloseDrawerOnBg(event)">
+  <div class="hs-drawer" id="worker-drawer"></div>
+</div>
+
+<!-- Location detail modal (reuses drawer overlay pattern) -->
+<div class="hs-overlay" id="location-drawer-overlay" onclick="hsCloseLocationDrawerOnBg(event)">
+  <div class="hs-drawer" id="location-drawer"></div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/risk-engine.js"></script>
+<script src="js/supervisor.js"></script>
+</body>
+</html>

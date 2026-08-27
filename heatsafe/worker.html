@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HeatSafe Worker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body style="background:var(--surface-alt);">
+
+<div class="hs-worker-shell">
+
+  <div class="hs-worker-topbar">
+    <div class="hs-brand">
+      <div class="hs-brand-mark" style="width:28px;height:28px;font-size:13px;">🌡️</div>
+      <div class="hs-brand-text"><div class="hs-brand-name">HeatSafe Worker</div></div>
+    </div>
+    <span class="hs-tag" style="background:rgba(255,255,255,0.12); color:#fff; border-color:rgba(255,255,255,0.25);">Prototype</span>
+  </div>
+
+  <div class="hs-worker-body">
+
+    <!-- ============ HOME ============ -->
+    <div id="screen-home" class="hs-screen">
+      <div class="hs-worker-greeting">
+        <h2>Good morning</h2>
+        <p>Worker 024</p>
+      </div>
+
+      <div class="hs-worker-section-title">Today's Heat Safety</div>
+      <div id="home-status-card" class="hs-status-card yellow">
+        <div class="hs-status-emoji">🟡</div>
+        <div class="hs-status-title">ELEVATED RISK</div>
+        <div class="hs-status-msg">Take regular breaks and stay hydrated.</div>
+      </div>
+
+      <button class="hs-btn hs-btn-primary hs-btn-block hs-btn-lg hs-mt-24" onclick="hsGoTo('step-location')">Check My Risk</button>
+
+      <div class="hs-worker-quicklinks">
+        <div class="hs-quicklink" onclick="hsGoTo('history')">
+          <div class="hs-quicklink-icon">📋</div>
+          My Recent Assessments
+        </div>
+        <div class="hs-quicklink" onclick="hsGoTo('home')">
+          <div class="hs-quicklink-icon">🏠</div>
+          Home
+        </div>
+      </div>
+
+      <p style="font-size:11.5px; color:var(--text-muted); margin-top:26px; text-align:center; line-height:1.5;">
+        Representative Data — This screen shows a rule-based estimate, not a medical diagnosis.
+      </p>
+    </div>
+
+    <!-- ============ STEP 1: LOCATION ============ -->
+    <div id="screen-step-location" class="hs-screen hs-hidden">
+      <div class="hs-step-progress"><span class="done"></span><span></span><span></span><span></span><span></span></div>
+      <div class="hs-step-label">Step 1 of 5</div>
+      <div class="hs-step-title">Where are you working today?</div>
+      <select id="input-location" class="hs-select-lg" onchange="hsSelectLocation()">
+        <option value="" disabled selected>Select your location</option>
+      </select>
+    </div>
+
+    <!-- ============ WEATHER (auto after location) ============ -->
+    <div id="screen-weather" class="hs-screen hs-hidden">
+      <div class="hs-step-label">Current Environmental Conditions</div>
+      <div class="hs-weather-card">
+        <h4>Location</h4>
+        <div id="weather-loc" class="hs-weather-loc">—</div>
+        <div id="weather-temp" class="hs-weather-temp">—</div>
+        <div class="hs-weather-grid">
+          <div class="hs-weather-metric"><div class="lbl">Humidity</div><div id="weather-humidity" class="val">—</div></div>
+          <div class="hs-weather-metric"><div class="lbl">Wind</div><div id="weather-wind" class="val">—</div></div>
+          <div class="hs-weather-metric"><div class="lbl">Solar</div><div id="weather-solar" class="val">—</div></div>
+        </div>
+        <div class="hs-weather-note">
+          <span class="hs-tag hs-tag-muted" style="margin-bottom:6px;">Representative Prototype Data</span><br/>
+          In a real deployment, environmental conditions would be obtained from live weather data.
+        </div>
+      </div>
+      <button class="hs-btn hs-btn-primary hs-btn-block hs-btn-lg hs-mt-24" onclick="hsGoTo('step-occupation')">Continue</button>
+    </div>
+
+    <!-- ============ STEP 2: OCCUPATION ============ -->
+    <div id="screen-step-occupation" class="hs-screen hs-hidden">
+      <div class="hs-step-progress"><span class="done"></span><span class="done"></span><span></span><span></span><span></span></div>
+      <div class="hs-step-label">Step 2 of 5</div>
+      <div class="hs-step-title">What kind of work do you do?</div>
+      <select id="input-occupation" class="hs-select-lg" onchange="hsSelectOccupation()">
+        <option value="" disabled selected>Select your occupation</option>
+      </select>
+    </div>
+
+    <!-- ============ STEP 3: INTENSITY ============ -->
+    <div id="screen-step-intensity" class="hs-screen hs-hidden">
+      <div class="hs-step-progress"><span class="done"></span><span class="done"></span><span class="done"></span><span></span><span></span></div>
+      <div class="hs-step-label">Step 3 of 5</div>
+      <div class="hs-step-title">How hard are you working?</div>
+
+      <button class="hs-choice-card" onclick="hsSelectIntensity('Light', this)">
+        <span class="hs-choice-icon">🙂</span>
+        <span><span class="hs-choice-title">LIGHT</span><br/><span class="hs-choice-desc">Low physical effort</span></span>
+      </button>
+      <button class="hs-choice-card" onclick="hsSelectIntensity('Moderate', this)">
+        <span class="hs-choice-icon">😐</span>
+        <span><span class="hs-choice-title">MODERATE</span><br/><span class="hs-choice-desc">Continuous physical effort</span></span>
+      </button>
+      <button class="hs-choice-card" onclick="hsSelectIntensity('Heavy', this)">
+        <span class="hs-choice-icon">😓</span>
+        <span><span class="hs-choice-title">HEAVY</span><br/><span class="hs-choice-desc">Strenuous physical effort</span></span>
+      </button>
+    </div>
+
+    <!-- ============ STEP 4: EXPOSURE ============ -->
+    <div id="screen-step-exposure" class="hs-screen hs-hidden">
+      <div class="hs-step-progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span></span></div>
+      <div class="hs-step-label">Step 4 of 5</div>
+      <div class="hs-step-title">How long will you be out in the heat?</div>
+      <select id="input-exposure" class="hs-select-lg" onchange="hsSelectExposure()">
+        <option value="" disabled selected>Select exposure duration</option>
+        <option value="< 1 hour">&lt; 1 hour</option>
+        <option value="1–2 hours">1–2 hours</option>
+        <option value="2–4 hours">2–4 hours</option>
+        <option value="4–6 hours">4–6 hours</option>
+        <option value="6+ hours">6+ hours</option>
+      </select>
+    </div>
+
+    <!-- ============ STEP 5: HYDRATION ============ -->
+    <div id="screen-step-hydration" class="hs-screen hs-hidden">
+      <div class="hs-step-progress"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span></div>
+      <div class="hs-step-label">Step 5 of 5</div>
+      <div class="hs-step-title">How much water have you had?</div>
+
+      <button class="hs-choice-card" onclick="hsSelectHydration('Good', this)">
+        <span class="hs-choice-icon">💧</span>
+        <span><span class="hs-choice-title">Good</span><br/><span class="hs-choice-desc">Adequately hydrated</span></span>
+      </button>
+      <button class="hs-choice-card" onclick="hsSelectHydration('Moderate', this)">
+        <span class="hs-choice-icon">💧</span>
+        <span><span class="hs-choice-title">Moderate</span><br/><span class="hs-choice-desc">Some water consumed</span></span>
+      </button>
+      <button class="hs-choice-card" onclick="hsSelectHydration('Low', this)">
+        <span class="hs-choice-icon">⚠️</span>
+        <span><span class="hs-choice-title">Low</span><br/><span class="hs-choice-desc">Little/no water recently</span></span>
+      </button>
+
+      <button id="btn-check-risk" class="hs-btn hs-btn-primary hs-btn-block hs-btn-lg hs-mt-24" disabled onclick="hsCheckRisk()">CHECK MY HEAT RISK</button>
+    </div>
+
+    <!-- ============ RESULT ============ -->
+    <div id="screen-result" class="hs-screen hs-hidden">
+      <div class="hs-result-hero">
+        <div class="hs-result-label">Your Heat Risk</div>
+        <div class="hs-gauge-wrap"><svg id="gauge-svg" viewBox="0 0 220 130"></svg></div>
+        <div id="result-level" class="hs-result-level red">🔴 HIGH</div>
+      </div>
+
+      <div class="hs-indicator-box hs-text-center">
+        <div class="hs-indicator-label">Estimated Heat-Stress Indicator</div>
+        <div id="result-indicator" class="hs-indicator-value">—</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Rule-Based Assessment · Not a medical diagnosis</div>
+      </div>
+
+      <div class="hs-worker-section-title">Why is my risk high?</div>
+      <ul id="result-why" class="hs-why-list"></ul>
+
+      <div class="hs-worker-section-title">What should I do?</div>
+      <div id="result-actions"></div>
+
+      <button class="hs-btn hs-btn-secondary hs-btn-block hs-btn-lg hs-mt-24" onclick="hsBackToHome()">BACK TO HOME</button>
+    </div>
+
+    <!-- ============ HISTORY ============ -->
+    <div id="screen-history" class="hs-screen hs-hidden">
+      <div class="hs-step-title">My Recent Assessments</div>
+      <div id="history-list" class="hs-card hs-card-pad"></div>
+      <button class="hs-btn hs-btn-secondary hs-btn-block hs-btn-lg hs-mt-24" onclick="hsGoTo('home')">Back to Home</button>
+    </div>
+
+  </div>
+
+  <div class="hs-worker-footer-nav">
+    <a href="index.html" class="hs-btn hs-btn-secondary hs-btn-block">Switch Portal</a>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/risk-engine.js"></script>
+<script src="js/worker.js"></script>
+</body>
+</html>

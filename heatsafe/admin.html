@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HeatSafe Admin — System Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="hs-prototype-corner"><span class="hs-tag">Prototype Mode</span></div>
+
+<header class="hs-topbar">
+  <div class="hs-topbar-inner">
+    <div class="hs-brand">
+      <div class="hs-brand-mark">🌡️</div>
+      <div class="hs-brand-text">
+        <div class="hs-brand-name">HEATSAFE ADMIN</div>
+        <div class="hs-brand-sub">Regional Heat-Stress Safety Monitoring</div>
+      </div>
+    </div>
+    <div class="hs-topbar-right">
+      <span class="hs-topbar-badge">Prototype / Simulated Data</span>
+      <a href="index.html" class="hs-switch-portal">Switch Portal</a>
+    </div>
+  </div>
+</header>
+
+<nav class="hs-subnav">
+  <div class="hs-subnav-inner">
+    <a href="#" class="nav-tab active" data-tab="overview">Overview</a>
+    <a href="#" class="nav-tab" data-tab="locations">Locations</a>
+    <a href="#" class="nav-tab" data-tab="workers">Workers</a>
+    <a href="#" class="nav-tab" data-tab="supervisors">Supervisors</a>
+    <a href="#" class="nav-tab" data-tab="analytics">Risk Analytics</a>
+    <a href="#" class="nav-tab" data-tab="system">System</a>
+  </div>
+</nav>
+
+<main class="hs-main">
+
+  <!-- ================= OVERVIEW ================= -->
+  <section id="tab-overview" class="hs-tab-panel">
+    <div class="hs-page-head">
+      <div class="hs-head-row">
+        <div>
+          <h1>System Overview</h1>
+          <p class="hs-sub">Regional Heat-Stress Safety Monitoring</p>
+        </div>
+        <span class="hs-tag">Prototype / Simulated Data</span>
+      </div>
+    </div>
+
+    <div class="hs-kpi-grid" id="overview-kpis"></div>
+
+    <div class="hs-grid-2">
+      <div class="hs-card hs-card-pad">
+        <div class="hs-section-title">Highest-Risk Locations</div>
+        <p class="hs-section-sub">Locations with the greatest concentration of high-risk workers.</p>
+        <div id="overview-top-locations"></div>
+      </div>
+      <div class="hs-card hs-card-pad">
+        <div class="hs-section-title">System-Wide Recommendations</div>
+        <p class="hs-section-sub">Generated from the full simulated dataset.</p>
+        <div id="overview-recommendations"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LOCATIONS ================= -->
+  <section id="tab-locations" class="hs-tab-panel hs-hidden">
+    <div class="hs-page-head">
+      <h1>Location Directory</h1>
+      <p class="hs-sub">All 15 monitored locations across the Coastal Belt and Inland Corridor.</p>
+    </div>
+    <div class="hs-table-wrap hs-table-scroll">
+      <table class="hs-table" id="locations-table">
+        <thead><tr><th>Location</th><th>Zone</th><th>Workers</th><th>🟢 Green</th><th>🟡 Yellow</th><th>🔴 Red</th><th>Risk Status</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= WORKERS ================= -->
+  <section id="tab-workers" class="hs-tab-panel hs-hidden">
+    <div class="hs-page-head">
+      <h1>Worker Directory</h1>
+      <p class="hs-sub">Search across all 120 simulated workers.</p>
+    </div>
+    <div class="hs-filter-bar">
+      <input type="text" id="admin-worker-search" placeholder="Search Worker..." oninput="hsRenderAdminWorkers()">
+      <select id="admin-risk-filter" onchange="hsRenderAdminWorkers()">
+        <option value="">All Risk Levels</option>
+        <option value="Lower">🟢 Lower Risk</option>
+        <option value="Elevated">🟡 Elevated Risk</option>
+        <option value="High">🔴 High Risk</option>
+      </select>
+    </div>
+    <div class="hs-table-wrap hs-table-scroll">
+      <table class="hs-table" id="admin-workers-table">
+        <thead><tr><th>Worker ID</th><th>Occupation</th><th>Location</th><th>Intensity</th><th>Exposure</th><th>Hydration</th><th>Heat Risk</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= SUPERVISORS ================= -->
+  <section id="tab-supervisors" class="hs-tab-panel hs-hidden">
+    <div class="hs-page-head">
+      <h1>Supervisor Directory</h1>
+      <p class="hs-sub">12 supervisors overseeing crews across all monitored worksites.</p>
+    </div>
+    <div class="hs-table-wrap hs-table-scroll">
+      <table class="hs-table" id="supervisors-table">
+        <thead><tr><th>Supervisor</th><th>Worksite</th><th>Crew Size</th><th>🟢</th><th>🟡</th><th>🔴</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= RISK ANALYTICS ================= -->
+  <section id="tab-analytics" class="hs-tab-panel hs-hidden">
+    <div class="hs-page-head">
+      <h1>Risk Analytics</h1>
+      <p class="hs-sub">Computed with the same deterministic risk engine used across all portals.</p>
+    </div>
+
+    <div class="hs-grid-2">
+      <div class="hs-card hs-card-pad">
+        <div class="hs-section-title">Regional Risk Distribution</div>
+        <p class="hs-section-sub">All 120 simulated workers.</p>
+        <div style="display:flex; align-items:center; gap:28px; flex-wrap:wrap;">
+          <svg id="donut-svg" width="180" height="180" viewBox="0 0 180 180"></svg>
+          <div class="hs-donut-legend" id="donut-legend" style="flex:1; min-width:160px;"></div>
+        </div>
+      </div>
+      <div class="hs-card hs-card-pad">
+        <div class="hs-section-title">Workers by Occupation</div>
+        <p class="hs-section-sub">Distribution across occupation categories.</p>
+        <div id="occupation-bars"></div>
+      </div>
+    </div>
+
+    <div class="hs-card hs-card-pad hs-mt-24">
+      <div class="hs-section-title">Location Risk</div>
+      <p class="hs-section-sub">Average risk score by location — same deterministic calculation as the Worker and Supervisor portals.</p>
+      <div id="location-bars"></div>
+    </div>
+  </section>
+
+  <!-- ================= SYSTEM ================= -->
+  <section id="tab-system" class="hs-tab-panel hs-hidden">
+    <div class="hs-page-head">
+      <h1>System</h1>
+      <p class="hs-sub">Methodology, data transparency, and the path from prototype to deployment.</p>
+    </div>
+
+    <div class="hs-card hs-card-pad">
+      <div class="hs-section-title">Risk Assessment Methodology</div>
+      <div class="hs-flow-vertical">
+        <div class="step">Environmental Conditions</div>
+        <div class="arrow">↓</div>
+        <div class="step">Worker Conditions</div>
+        <div class="arrow">↓</div>
+        <div class="step">Heat-Stress Calculation</div>
+        <div class="arrow">↓</div>
+        <div class="step">Risk Classification</div>
+        <div class="arrow">↓</div>
+        <div class="step">Recommended Action</div>
+      </div>
+      <p style="font-size:13.5px;">The prototype combines representative environmental conditions with worker-specific factors such as occupation, work intensity, exposure duration, hydration status, and acclimatization status. The result is a transparent, rule-based estimate — not an AI prediction and not a medical diagnosis.</p>
+
+      <div class="hs-section-title hs-mt-24">Classification</div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:10px;">
+        <span class="hs-risk-badge green">🟢 Lower Risk</span>
+        <span class="hs-risk-badge yellow">🟡 Elevated Risk</span>
+        <span class="hs-risk-badge red">🔴 High Risk</span>
+      </div>
+    </div>
+
+    <div class="hs-card hs-card-pad hs-mt-24">
+      <div class="hs-section-title">Data Transparency</div>
+      <div class="hs-data-card-grid hs-mt-16">
+        <div class="hs-card hs-data-card">
+          <div class="icon">👷</div>
+          <h4>Worker Data</h4>
+          <p>Representative / aggregate prototype data. No personal worker information is used.</p>
+        </div>
+        <div class="hs-card hs-data-card">
+          <div class="icon">🌦️</div>
+          <h4>Weather</h4>
+          <p>Predefined representative weather values. No live external API is required for this demonstration.</p>
+        </div>
+        <div class="hs-card hs-data-card">
+          <div class="icon">⚙️</div>
+          <h4>Risk Engine</h4>
+          <p>Deterministic rule-based calculation, shared identically by all three portals.</p>
+        </div>
+      </div>
+      <p class="hs-mt-16" style="font-size:12.5px; color:var(--text-muted);">No personal worker information is used in this prototype. No live external API is required for the demonstration.</p>
+    </div>
+
+    <div class="hs-card hs-card-pad hs-mt-24">
+      <div class="hs-section-title">From Prototype to Deployment</div>
+      <div class="hs-deploy-grid hs-mt-16">
+        <div class="hs-deploy-col">
+          <h4>Prototype (this demo)</h4>
+          <div class="step">Representative data</div>
+          <div class="step">Rule-based assessment</div>
+          <div class="step">Dashboard</div>
+        </div>
+        <div class="hs-deploy-arrow">→</div>
+        <div class="hs-deploy-col">
+          <h4>Future System</h4>
+          <div class="step">e-Shram aggregate occupational / location data</div>
+          <div class="plus">+</div>
+          <div class="step">Live weather service</div>
+          <div class="plus">+</div>
+          <div class="step">Worker inputs</div>
+          <div class="plus">+</div>
+          <div class="step">Validated occupational heat-stress methodology</div>
+          <div class="arrow" style="text-align:center; color:var(--text-muted);">↓</div>
+          <div class="step">Personalized assessment</div>
+          <div class="arrow" style="text-align:center; color:var(--text-muted);">↓</div>
+          <div class="step">SMS / IVR</div>
+          <div class="arrow" style="text-align:center; color:var(--text-muted);">↓</div>
+          <div class="step">Supervisor dashboard</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="hs-footer">
+  <div class="hs-footer-inner">
+    <span class="hs-footer-icon">ℹ️</span>
+    <p>This prototype demonstrates the proposed HeatSafe workflow using representative data and deterministic rules. It is not a live occupational health monitoring or medical diagnostic system.</p>
+  </div>
+</footer>
+
+<div class="hs-overlay" id="worker-drawer-overlay" onclick="hsCloseDrawerOnBg(event)">
+  <div class="hs-drawer" id="worker-drawer"></div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/risk-engine.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

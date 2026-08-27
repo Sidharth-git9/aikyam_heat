@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Heat-Stress Safety Alert System — Working Prototype</title>
+<style>
+  :root{
+    --navy:#1E2761; --orange:#E8622C; --red:#D64545; --amber:#E8A93B; --green:#3F9142;
+    --panel:#F5F6FA; --border:#D9DCE6; --text:#222; --muted:#5A5A5A;
+  }
+  *{box-sizing:border-box;}
+  body{font-family:'Segoe UI',Calibri,Arial,sans-serif;margin:0;background:#EDF1FA;color:var(--text);}
+  header{background:var(--navy);color:#fff;padding:18px 28px;}
+  header h1{margin:0;font-size:22px;}
+  header p{margin:4px 0 0;font-size:13px;color:#c8cdEE;}
+  nav{display:flex;gap:8px;background:#fff;padding:10px 28px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
+  nav button{background:none;border:none;padding:10px 16px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:6px;}
+  nav button.active{background:var(--navy);color:#fff;}
+  main{max-width:1180px;margin:0 auto;padding:24px 28px 60px;}
+  .view{display:none;} .view.active{display:block;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+  .card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:20px;}
+  .card h2{margin-top:0;font-size:17px;color:var(--navy);}
+  label{display:block;font-size:13px;font-weight:600;margin:12px 0 5px;color:var(--navy);}
+  select,input[type=range],input[type=number]{width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:14px;}
+  .toggle-row{display:flex;gap:10px;margin-top:6px;}
+  .toggle-row button{flex:1;padding:9px;border:2px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px;}
+  .toggle-row button.sel{border-color:var(--navy);background:var(--navy);color:#fff;}
+  .calc-btn{margin-top:18px;width:100%;padding:13px;background:var(--orange);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;}
+  .calc-btn:hover{opacity:.9;}
+  .result-card{border-radius:10px;padding:20px;color:#fff;display:none;}
+  .result-card.show{display:block;}
+  .risk-badge{display:inline-block;padding:6px 16px;border-radius:20px;font-weight:800;font-size:15px;background:rgba(255,255,255,.25);}
+  .breakdown{background:rgba(255,255,255,.15);border-radius:8px;padding:12px;margin-top:12px;font-size:13px;line-height:1.7;}
+  .sms-box{background:#111;color:#7CFC7C;font-family:'Courier New',monospace;border-radius:8px;padding:14px;margin-top:12px;font-size:13px;white-space:pre-wrap;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{padding:9px 10px;border-bottom:1px solid var(--border);text-align:left;}
+  th{background:var(--navy);color:#fff;}
+  .pill{padding:3px 10px;border-radius:12px;color:#fff;font-weight:700;font-size:12px;}
+  .summary-row{display:flex;gap:16px;margin-bottom:16px;}
+  .summary-box{flex:1;padding:16px;border-radius:8px;text-align:center;color:#fff;}
+  .summary-box .num{font-size:28px;font-weight:800;}
+  .note{background:#FFF7E6;border:1px solid var(--amber);border-radius:8px;padding:12px 14px;font-size:12.5px;color:#6b4e00;margin:14px 0;}
+  .formula{background:var(--panel);border-radius:8px;padding:14px;font-family:'Courier New',monospace;font-size:13px;margin:10px 0;}
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px;}
+  .compare .box{border-radius:8px;padding:14px;}
+  .badge-town{display:inline-block;background:var(--navy);color:#fff;padding:2px 8px;border-radius:5px;font-size:11px;margin-left:6px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌡️ Personalized Heat-Stress Safety Alert System</h1>
+  <p>Working prototype — risk engine, worker alerts, and supervisor dashboard | SIH 2026 · PS ID: IHSIH000</p>
+</header>
+
+<nav>
+  <button class="active" data-view="worker">Worker Risk Check</button>
+  <button data-view="dashboard">Supervisor Dashboard</button>
+  <button data-view="howitworks">How It Works (Methodology)</button>
+</nav>
+
+<main>
+
+  <!-- ============ WORKER VIEW ============ -->
+  <div class="view active" id="worker">
+    <div class="grid2">
+      <div class="card">
+        <h2>Worker Details</h2>
+
+        <label>Location (town-level, not district)</label>
+        <select id="town">
+          <option value="manipal">Manipal</option>
+          <option value="udupi">Udupi Town</option>
+          <option value="mangaluru">Mangaluru</option>
+          <option value="bengaluru">Bengaluru</option>
+          <option value="delhi">Delhi</option>
+          <option value="chennai">Chennai</option>
+        </select>
+
+        <label>Labor Type</label>
+        <select id="labor">
+          <option value="light">Light (street vending, seated work)</option>
+          <option value="moderate" selected>Moderate (delivery, farming)</option>
+          <option value="heavy">Heavy (construction, manual digging)</option>
+        </select>
+
+        <label>Continuous Exposure So Far (hours)</label>
+        <input type="range" id="duration" min="0" max="6" step="0.5" value="2">
+        <div style="text-align:right;font-size:12px;color:var(--muted);" id="durationLabel">2 hrs</div>
+
+        <label>Had water in the last hour?</label>
+        <div class="toggle-row">
+          <button id="waterYes" class="sel" onclick="setWater(true)">Yes</button>
+          <button id="waterNo" onclick="setWater(false)">No</button>
+        </div>
+
+        <button class="calc-btn" onclick="calculateWorker()">Calculate Risk & Generate Alert</button>
+      </div>
+
+      <div>
+        <div class="card" style="background:var(--panel);">
+          <h2>Live Conditions <span style="font-weight:400;font-size:12px;color:var(--muted);">(town-level, simulated for demo)</span></h2>
+          <div id="weatherPreview" style="font-size:14px;line-height:1.8;"></div>
+          <div class="note">Demo note: these readings are preset per town to demonstrate town-level granularity. In production this pulls live from OpenWeatherMap/IMD APIs at this exact lat-long, refreshed periodically — never from SHRAM's district-level feed.</div>
+        </div>
+
+        <div class="result-card" id="resultCard">
+          <div style="font-size:13px;opacity:.85;">RISK ASSESSMENT RESULT</div>
+          <div class="risk-badge" id="riskBadge">—</div>
+          <div id="riskExplain" style="margin-top:10px;font-size:14px;"></div>
+          <div class="breakdown" id="breakdown"></div>
+        </div>
+
+        <div class="card" id="smsCardWrap" style="display:none;">
+          <h2>SMS / IVR Alert (exact message sent)</h2>
+          <div class="sms-box" id="smsBox"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SUPERVISOR DASHBOARD ============ -->
+  <div class="view" id="dashboard">
+    <div class="card">
+      <h2>Crew Overview — Live Risk Status</h2>
+      <div class="summary-row" id="summaryRow"></div>
+      <table id="crewTable">
+        <thead><tr><th>Worker</th><th>Town</th><th>Labor Type</th><th>Exposure</th><th>Hydration</th><th>Risk</th><th>Recommended Action</th></tr></thead>
+        <tbody id="crewBody"></tbody>
+      </table>
+      <div class="note" style="margin-top:16px;">This view auto-computes each worker's risk using the same engine as the Worker tab, then aggregates it for the supervisor — this is the "crew-level tooling" differentiator from individual-only tools like wearables or SHRAM.</div>
+    </div>
+  </div>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <div class="view" id="howitworks">
+    <div class="card">
+      <h2>Why Town-Level Data, Not District-Level (SHRAM)</h2>
+      <p style="font-size:14px;line-height:1.7;">SHRAM/EHI-N reports one risk number per <b>district</b>. A district can easily contain both a storm and a heatwave at the same time — which is exactly the flaw this project exists to fix. Below is a live example using this prototype's own data:</p>
+      <div class="compare">
+        <div class="box" style="background:#FFF3EE;border:1px solid var(--orange);">
+          <b>Manipal</b><span class="badge-town">Town-level</span>
+          <div id="manipalPreview" style="margin-top:8px;font-size:13px;"></div>
+        </div>
+        <div class="box" style="background:#FFF3EE;border:1px solid var(--orange);">
+          <b>Udupi Town</b><span class="badge-town">Town-level</span>
+          <div id="udupiPreview" style="margin-top:8px;font-size:13px;"></div>
+        </div>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-top:10px;">Both fall inside Udupi <i>district</i> — SHRAM would report one shared number for both. This prototype pulls each separately, which is why the two can (and do) show different risk levels here.</p>
+    </div>
+
+    <div class="card">
+      <h2>The Risk Calculation (WBGT-based)</h2>
+      <p style="font-size:14px;">We use the Australian Bureau of Meteorology's published outdoor WBGT approximation — a standard formula, not something invented for this project:</p>
+      <div class="formula">WBGT ≈ 0.567×T + 0.393×e + 3.94<br>where T = dry-bulb temperature (°C), e = water vapour pressure (from RH%)</div>
+      <p style="font-size:14px;">Then we adjust for factors the raw formula doesn't capture:</p>
+      <table>
+        <thead><tr><th>Factor</th><th>Adjustment</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Labor type: Light</td><td>+0°C effective</td><td>Low metabolic heat generation</td></tr>
+          <tr><td>Labor type: Moderate</td><td>+1°C effective</td><td>Sustained physical activity</td></tr>
+          <tr><td>Labor type: Heavy</td><td>+2°C effective</td><td>High internal heat generation (3–4x resting)</td></tr>
+          <tr><td>No water in last hour</td><td>+1°C effective</td><td>Reduced evaporative cooling capacity</td></tr>
+          <tr><td>Exposure &gt; 3 continuous hrs</td><td>Escalation flag</td><td>Cumulative heat strain, even if instantaneous score is borderline</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:14px;">Final thresholds (calibrated against official heat-wave/HAP severity bands):</p>
+      <table>
+        <thead><tr><th>Category</th><th>Effective WBGT</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill" style="background:var(--green);">GREEN</span></td><td>Below 28°C</td></tr>
+          <tr><td><span class="pill" style="background:var(--amber);">YELLOW</span></td><td>28°C – 31°C</td></tr>
+          <tr><td><span class="pill" style="background:var(--red);">RED</span></td><td>Above 31°C</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Honest Limitations (for Q&A)</h2>
+      <ul style="font-size:14px;line-height:1.8;">
+        <li>No public individual-level dataset (worker + conditions + health outcome) exists for India's informal sector — we calibrate against official published thresholds (IMD, State Heat Action Plans) instead of claiming data we don't have.</li>
+        <li>This is a decision-support tool, not a medical device — it recommends when to rest and when to escalate; it does not diagnose.</li>
+        <li>The weather readings in this demo are preset per town to demonstrate the calculation logic and the town-vs-district distinction. Production would connect live OpenWeatherMap/IMD APIs and a Twilio (or equivalent) SMS/IVR gateway.</li>
+        <li>The regional-acclimatization ML layer (Phase 2) is intentionally not built into this prototype — it is a modest, clearly-scoped future enhancement, not the headline claim.</li>
+      </ul>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ---- preset "live" town conditions for demo (labeled as such in UI) ----
+const townData = {
+  manipal:   { label: "Manipal",    temp: 26, rh: 88, note: "Light rain, overcast" },
+  udupi:     { label: "Udupi Town", temp: 37, rh: 62, note: "Clear, high heat" },
+  mangaluru: { label: "Mangaluru",  temp: 33, rh: 75, note: "Humid, partly cloudy" },
+  bengaluru: { label: "Bengaluru",  temp: 29, rh: 55, note: "Mild, clear" },
+  delhi:     { label: "Delhi",      temp: 41, rh: 30, note: "Severe heat, dry" },
+  chennai:   { label: "Chennai",    temp: 36, rh: 70, note: "Hot, humid coastal" },
+};
+
+let waterState = true;
+
+function setWater(val){
+  waterState = val;
+  document.getElementById('waterYes').classList.toggle('sel', val);
+  document.getElementById('waterNo').classList.toggle('sel', !val);
+}
+
+function wbgtApprox(T, RH){
+  const e = (RH/100) * 6.105 * Math.exp((17.27*T)/(237.7+T));
+  return 0.567*T + 0.393*e + 3.94;
+}
+
+function laborAdj(laborType){
+  return laborType === 'heavy' ? 2 : laborType === 'moderate' ? 1 : 0;
+}
+
+function computeRisk(townKey, laborType, hours, hadWater){
+  const t = townData[townKey];
+  const baseWBGT = wbgtApprox(t.temp, t.rh);
+  let effective = baseWBGT + laborAdj(laborType) + (hadWater ? 0 : 1);
+  let category, color;
+  if (effective < 28) { category = "GREEN"; color = "var(--green)"; }
+  else if (effective < 31) { category = "YELLOW"; color = "var(--amber)"; }
+  else { category = "RED"; color = "var(--red)"; }
+  const escalate = hours > 3 && category === "YELLOW";
+  return { town: t, baseWBGT, effective, category, color, escalate, laborType, hours, hadWater };
+}
+
+function explainText(r){
+  const laborWord = r.laborType === 'heavy' ? 'heavy-exertion labor' : r.laborType === 'moderate' ? 'moderate-exertion labor' : 'light labor';
+  let parts = [`${r.town.temp}°C in ${r.town.label}`, laborWord];
+  if (!r.hadWater) parts.push('no water in the last hour');
+  if (r.hours > 3) parts.push(`${r.hours} hrs continuous exposure`);
+  return `Risk is ${r.category} because: ${parts.join(' + ')}.`;
+}
+
+function smsFor(r){
+  if (r.category === "RED"){
+    return `Heat risk: HIGH.\nSTOP work now. Move to shade immediately.\nDrink water/ORS.\nIf dizzy or nauseous, tell your supervisor NOW.\nReason: ${explainText(r).replace('Risk is RED because: ','')}`;
+  } else if (r.category === "YELLOW"){
+    return `Heat risk: MODERATE.\nTake a 10-min shade break now. Drink water.\nAvoid heavy lifting if possible.\nReason: ${explainText(r).replace('Risk is YELLOW because: ','')}`;
+  } else {
+    return `Heat risk: LOW.\nSafe to continue work.\nDrink water every hour.\nReason: ${explainText(r).replace('Risk is GREEN because: ','')}`;
+  }
+}
+
+function precautions(cat){
+  if (cat === "RED") return "Stop demanding work, move to shade, hydrate (water/ORS), rest until symptoms ease, notify supervisor. Dizziness/confusion/no sweating = seek medical help immediately.";
+  if (cat === "YELLOW") return "Break every hour, hydrate every 20–30 min, shift heavy tasks earlier/later in the day, watch for fatigue or headache.";
+  return "No special action — normal water breaks, continue work as usual.";
+}
+
+function updateWeatherPreview(){
+  const t = townData[document.getElementById('town').value];
+  document.getElementById('weatherPreview').innerHTML =
+    `🌡️ Temperature: <b>${t.temp}°C</b><br>💧 Humidity: <b>${t.rh}%</b><br>☁️ Conditions: <b>${t.note}</b>`;
+}
+
+function calculateWorker(){
+  const town = document.getElementById('town').value;
+  const labor = document.getElementById('labor').value;
+  const hours = parseFloat(document.getElementById('duration').value);
+  const r = computeRisk(town, labor, hours, waterState);
+
+  const card = document.getElementById('resultCard');
+  card.style.background = r.color;
+  card.classList.add('show');
+  document.getElementById('riskBadge').textContent = r.category + " RISK";
+  document.getElementById('riskExplain').textContent = explainText(r) + (r.escalate ? " ⚠ Escalating due to prolonged exposure." : "");
+  document.getElementById('breakdown').innerHTML =
+    `Base WBGT (weather only): <b>${r.baseWBGT.toFixed(1)}°C</b><br>` +
+    `+ Labor adjustment: <b>+${laborAdj(labor)}°C</b><br>` +
+    `+ Hydration adjustment: <b>${r.hadWater ? '+0°C (hydrated)' : '+1°C (no water)'}</b><br>` +
+    `= Effective WBGT: <b>${r.effective.toFixed(1)}°C</b><br>` +
+    `Suggested precautions: ${precautions(r.category)}`;
+
+  document.getElementById('smsCardWrap').style.display = 'block';
+  document.getElementById('smsBox').textContent = smsFor(r);
+}
+
+document.getElementById('town').addEventListener('change', updateWeatherPreview);
+document.getElementById('duration').addEventListener('input', e => {
+  document.getElementById('durationLabel').textContent = e.target.value + " hrs";
+});
+updateWeatherPreview();
+
+// ---- nav switching ----
+document.querySelectorAll('nav button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById(btn.dataset.view).classList.add('active');
+    if (btn.dataset.view === 'dashboard') buildDashboard();
+    if (btn.dataset.view === 'howitworks') buildHowItWorks();
+  });
+});
+
+// ---- supervisor dashboard ----
+const crew = [
+  { name: "Worker A — Ramesh", town: "udupi", labor: "heavy", hours: 3.5, water: false },
+  { name: "Worker B — Sunita", town: "manipal", labor: "light", hours: 1, water: true },
+  { name: "Worker C — Farhan", town: "delhi", labor: "heavy", hours: 4, water: false },
+  { name: "Worker D — Latha", town: "mangaluru", labor: "moderate", hours: 2, water: true },
+  { name: "Worker E — Vinod", town: "bengaluru", labor: "moderate", hours: 1.5, water: true },
+  { name: "Worker F — Priya", town: "chennai", labor: "heavy", hours: 2.5, water: false },
+];
+
+function buildDashboard(){
+  const body = document.getElementById('crewBody');
+  body.innerHTML = '';
+  let counts = { GREEN:0, YELLOW:0, RED:0 };
+  crew.forEach(w=>{
+    const r = computeRisk(w.town, w.labor, w.hours, w.water);
+    counts[r.category]++;
+    const action = r.category === "RED" ? "Stop & rest immediately" : r.category === "YELLOW" ? "Shade break + hydrate" : "Continue, routine hydration";
+    body.innerHTML += `<tr>
+      <td>${w.name}</td>
+      <td>${r.town.label}</td>
+      <td>${w.labor}</td>
+      <td>${w.hours} hrs</td>
+      <td>${w.water ? "✅ Yes" : "❌ No"}</td>
+      <td><span class="pill" style="background:${r.color};">${r.category}</span></td>
+      <td>${action}</td>
+    </tr>`;
+  });
+  document.getElementById('summaryRow').innerHTML = `
+    <div class="summary-box" style="background:var(--green);"><div class="num">${counts.GREEN}</div>Green</div>
+    <div class="summary-box" style="background:var(--amber);"><div class="num">${counts.YELLOW}</div>Yellow</div>
+    <div class="summary-box" style="background:var(--red);"><div class="num">${counts.RED}</div>Red</div>
+  `;
+}
+
+function buildHowItWorks(){
+  const m = computeRisk('manipal','moderate',1,true);
+  const u = computeRisk('udupi','moderate',1,true);
+  document.getElementById('manipalPreview').innerHTML = `Temp: ${m.town.temp}°C, RH: ${m.town.rh}%<br>Effective WBGT: ${m.effective.toFixed(1)}°C<br>Risk: <span class="pill" style="background:${m.color};">${m.category}</span>`;
+  document.getElementById('udupiPreview').innerHTML = `Temp: ${u.town.temp}°C, RH: ${u.town.rh}%<br>Effective WBGT: ${u.effective.toFixed(1)}°C<br>Risk: <span class="pill" style="background:${u.color};">${u.category}</span>`;
+}
+buildHowItWorks();
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HeatSafe — Personalized Heat-Stress Safety System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <div class="hs-prototype-corner">
+    <span class="hs-tag">Prototype Mode</span>
+  </div>
+
+  <header class="hs-landing-header">
+    <div class="hs-container">
+      <div class="hs-brand">
+        <div class="hs-brand-mark">🌡️</div>
+        <div class="hs-brand-text">
+          <div class="hs-brand-name">HEATSAFE</div>
+          <div class="hs-brand-sub">Personalized Heat-Stress Safety System</div>
+        </div>
+      </div>
+      <span class="hs-topbar-badge">Smart India Hackathon 2026</span>
+    </div>
+  </header>
+
+  <section class="hs-landing-hero">
+    <h1>Welcome to HeatSafe</h1>
+    <p>Select your portal</p>
+  </section>
+
+  <section class="hs-portal-grid">
+    <div class="hs-portal-card">
+      <div class="hs-portal-icon">👷</div>
+      <div class="hs-portal-lead">WORKER</div>
+      <h3>Check my heat-stress risk</h3>
+      <p class="hs-portal-desc">Simple interface designed for workers.</p>
+      <a href="worker.html" class="hs-btn hs-btn-primary hs-btn-block">Enter Worker Portal</a>
+    </div>
+
+    <div class="hs-portal-card">
+      <div class="hs-portal-icon">🦺</div>
+      <div class="hs-portal-lead">SUPERVISOR</div>
+      <h3>Monitor your worksite</h3>
+      <p class="hs-portal-desc">View crew risk and safety recommendations.</p>
+      <a href="supervisor.html" class="hs-btn hs-btn-primary hs-btn-block">Enter Supervisor Portal</a>
+    </div>
+
+    <div class="hs-portal-card">
+      <div class="hs-portal-icon">🛡️</div>
+      <div class="hs-portal-lead">ADMIN</div>
+      <h3>System-wide safety overview</h3>
+      <p class="hs-portal-desc">Monitor locations, workers, and risk trends.</p>
+      <a href="admin.html" class="hs-btn hs-btn-primary hs-btn-block">Enter Admin Portal</a>
+    </div>
+  </section>
+
+  <section class="hs-flow-strip">
+    <div class="hs-flow-card">
+      <h4>How HeatSafe works</h4>
+      <div class="hs-flow-diagram">
+        <div class="hs-flow-node">Worker self-check</div>
+        <span class="hs-flow-arrow">→</span>
+        <div class="hs-flow-node">Environmental + work conditions</div>
+        <span class="hs-flow-arrow">→</span>
+        <div class="hs-flow-node">Shared rule-based risk engine</div>
+        <span class="hs-flow-arrow">→</span>
+        <div class="hs-flow-node">Supervisor crew view</div>
+        <span class="hs-flow-arrow">→</span>
+        <div class="hs-flow-node">Admin regional overview</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="hs-footer">
+    <div class="hs-footer-inner">
+      <span class="hs-footer-icon">ℹ️</span>
+      <p>This prototype demonstrates the proposed HeatSafe workflow using representative data and deterministic rules. It is not a live occupational health monitoring or medical diagnostic system. No real authentication is used — role selection is for demonstration only.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
